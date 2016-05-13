@@ -3,7 +3,7 @@ using Cbc
 
 println("Hello Julia")
 
-m = Model(solver = CbcSolver(seconds=0))
+m = Model(solver = CbcSolver(seconds=10))
 @variable(m, 0 <= x <= 2 )
 @variable(m, 0 <= y <= 30 )
 

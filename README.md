@@ -26,3 +26,20 @@ Constraints:
 Optimize:
 
 Assign the products to a promotion such that the largest discount is achieved.
+
+## Test Data Case 1 - Wehkamp says it's not solvable with Mixed Integer Programming
+
+Products:
+
+- "Zwitsal Huidolie" a 10 euro
+- "Zwitsal Bodylotion" a 8 euro
+- "Zwitsal Shampoo" a 9 euro
+- "Andrelon Shamppo" a 6 euro
+- "Niveau Shampoo" a 7 euro
+
+Promotions:
+
+- Buy 4 products, get a discount of 8 euro (fixed)
+- Buy 3 Zwistal products, get the cheapest one for free
+- Buy 3 shampoo's, get the cheapest one for free
+
