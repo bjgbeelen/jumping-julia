@@ -10,6 +10,8 @@ end
 type Promotion
   numberOfProducts::Int
   discount::Int
+  brand::AbstractString
+  product::AbstractString
 end
 
 println("Hello Julia")
@@ -35,8 +37,9 @@ basket = [
  Item("Nivea", "Shampoo", 7) ]
 
 promotions = [ 
-  Promotion(3, 10),
-  Promotion(4, 20)
+  Promotion(4, 7, "", "")
+  Promotion(3, 0, "Zwitsal", "")
+  Promotion(3, 0, "", "Shampoo")
 ]
 
 @variable(m, 0 <= disc[basket, promotions] <= 1, Bin)
@@ -59,7 +62,41 @@ for item in basket
   @constraint(m, sum{disc[item,p], p=promotions} <= 1)
 end
 
-@objective(m, Max, sum{chosen[p], p=promotions})
+for promotion in promotions, item in basket
+  if promotion.brand != "" && promotion.brand != item.brand
+    @constraint(m, disc[item, promotion] == 0)
+  end
+  if promotion.product != "" && promotion.product != item.product
+    @constraint(m, disc[item, promotion] == 0)
+  end
+end
+
+@variable(m, 0 <= cheapest[basket, promotions] <= 1, Bin)
+for promotion in promotions
+  if promotion.discount == 0
+    # there is only one item the cheapest (if the promotion is chosen)
+    @constraint(m, sum{cheapest[item, promotion], item=basket} == 1 * chosen[promotion])
+
+    # value of the cheapest selection item = sum{n.price * cheapest[n, promotion], n=basket}
+    #for item in basket
+      # if selected, the cheapest should be cheaper:
+    #  @constraint(m, item.price >= sum{n.price * cheapest[n, promotion] * disc[item, promotion], n=basket})
+    #end
+  end
+end
+
+@variable(m, 0 <= valueof[promotions] <= 1000)
+
+for promotion in promotions
+  if promotion.discount == 0
+    @constraint(m, valueof[promotion] == sum{item.price * cheapest[item, promotion], item=basket})
+  end
+  if promotion.discount != 0
+    @constraint(m, valueof[promotion] == chosen[promotion] * promotion.discount)
+  end
+end
+
+@objective(m, Max, sum{valueof[p], p=promotions})
 
 print(m)
 
